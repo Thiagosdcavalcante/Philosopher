@@ -6,30 +6,12 @@
 /*   By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/10 21:16:01 by tsantana          #+#    #+#             */
-/*   Updated: 2024/07/21 20:48:17 by tsantana         ###   ########.fr       */
+/*   Updated: 2024/07/25 19:50:08 by tsantana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/philo.h"
-
-static void	correct_input(int ac, char **av, t_general *gnrl)
-{
-	int	i;
-
-	i = 1;
-	gnrl->qnt_philos = ft_atoi(av[1]);
-	printf("philos: %d\n", gnrl->qnt_philos);
-	gnrl->time_eat = ft_atoi(av[2]);
-	printf("eat: %ld\n", gnrl->time_eat);
-	gnrl->time_sleep = ft_atoi(av[3]);
-	printf("sleep: %ld\n", gnrl->time_sleep);
-	gnrl->qnt_forks = ft_atoi(av[1]);
-	printf("forks: %d\n", gnrl->qnt_forks);
-	if (ac == 5)
-		gnrl->philos = make_philo_order(av[1]);
-	else
-		printf("%s\n", av[i]);
-}
+#include <stdlib.h>
 
 static void	error_input(int ac)
 {
@@ -73,12 +55,12 @@ int	main(int ac, char **av)
 	t_general	main_strc;
 
 	main_strc = (t_general){0};
-	if (ac >= 5 && ac <= 6)
+	if (ac == 5 || ac == 6)
 	{
 		if (valid_args(av))
-			return (correct_input(ac, av, &main_strc), 0);
+			return (correct_input(ac, av, &main_strc), EXIT_SUCCESS);
 	}
 	else
-		return (error_input(ac), 1);
-	return (0);
+		return (error_input(ac), EXIT_FAILURE);
+	return (EXIT_SUCCESS);
 }

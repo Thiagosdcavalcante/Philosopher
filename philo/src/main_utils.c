@@ -6,23 +6,33 @@
 /*   By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/11 17:31:24 by tsantana          #+#    #+#             */
-/*   Updated: 2024/07/21 17:38:55 by tsantana         ###   ########.fr       */
+/*   Updated: 2024/07/25 19:16:04 by tsantana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/philo.h"
 #include <stdio.h>
 
-static void	print_philo(t_philos *phl)
+void	print_philo(t_philos *phl)
 {
 	int	stop;
 
-	stop = phl->philo;
-	printf(GRN "PHILO: %d -\n" RESET, phl->philo);
+	stop = phl->id;
+	printf(GRN "PHILO: %d -" RESET, phl->id);
+	if (phl->f_right)
+		printf(GRN " TRUE" RESET);
+	else
+		printf(GRN " FALSE" RESET);
+	printf(GRN "\n" RESET);
 	phl = phl->nxt;
-	while (phl->philo != stop)
+	while (phl->id != stop)
 	{
-		printf(GRN "PHILO: %d -\n" RESET, phl->philo);
+		printf(GRN "PHILO: %d -" RESET, phl->id);
+		if (phl->f_right)
+			printf(GRN " TRUE" RESET);
+		else
+			printf(GRN " FALSE" RESET);
+		printf(GRN "\n" RESET);
 		phl = phl->nxt;
 	}
 }
@@ -34,7 +44,11 @@ static t_philos	*make_sequence_philos(int numb, t_philos *head)
 	philo = malloc(sizeof(t_philos));
 	if (!philo)
 		return (NULL);
-	philo->philo = numb;
+	philo->philo = 0;
+	philo->f_left = (t_mutex){0};
+	philo->f_right = NULL;
+	pthread_mutex_init(&philo->f_left, NULL);
+	philo->id = numb;
 	philo->nxt = head;
 	philo->prv = NULL;
 	head->prv = philo;
@@ -48,7 +62,11 @@ static t_philos	*init_philo(void)
 	philo = malloc(sizeof(t_philos));
 	if (!philo)
 		return (NULL);
-	philo->philo = 1;
+	philo->id = 1;
+	philo->philo = 0;
+	philo->f_right = NULL;
+	philo->f_left = (t_mutex){0};
+	pthread_mutex_init(&philo->f_left, NULL);
 	philo->nxt = NULL;
 	philo->prv = NULL;
 	return (philo);
@@ -75,7 +93,6 @@ t_philos	*make_philo_order(char *num)
 			i++;
 		}
 	}
-	print_philo(head);
 	return (head);
 }
 

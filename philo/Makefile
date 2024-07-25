@@ -6,7 +6,7 @@
 #    By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/20 16:52:41 by tsantana          #+#    #+#              #
-#    Updated: 2024/07/19 16:43:45 by tsantana         ###   ########.fr        #
+#    Updated: 2024/07/24 15:47:33 by tsantana         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,7 +20,8 @@ HEADERS	:= -I include/ -I lib/libft/
 
 SRC		:= src/main.c \
 			src/main_utils.c \
-			src/ft_atoi.c
+			src/ft_atoi.c \
+			src/correct_input.c
 
 OBJ		:= $(SRC:%.c=%.o)
 

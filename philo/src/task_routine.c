@@ -1,45 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_atoi.c                                          :+:      :+:    :+:   */
+/*   task_routine.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/07/24 15:44:10 by tsantana          #+#    #+#             */
-/*   Updated: 2024/07/24 15:47:01 by tsantana         ###   ########.fr       */
+/*   Created: 2024/07/25 19:15:37 by tsantana          #+#    #+#             */
+/*   Updated: 2024/07/25 19:50:13 by tsantana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/philo.h"
+#include <pthread.h>
+#include <stdlib.h>
 
-static int	ft_isdigit(char c)
+static int	monitoring_routine()
 {
-	if (c >= '0' && c <= '9')
-		return (1);
-	return (0);
+
 }
 
-int	ft_atoi(const char *nptr)
+int	check_routine(t_general *general)
 {
-	int	result;
-	int	i;
-	int	sign;
-
-	result = 0;
-	i = 0;
-	sign = 1;
-	while (nptr[i] == ' ' || (nptr[i] >= '\t' && nptr[i] <= '\r'))
-		i++;
-	if (nptr[i] == '-' || nptr[i] == '+')
+	pthread_create(general->monitors, NULL, monitoring_routine(), )
+	while (1)
 	{
-		if (nptr[i] == '-')
-			sign = -1;
-		i++;
 	}
-	while (ft_isdigit(nptr[i]))
-	{
-		result = result * 10 + (nptr[i] - '0');
-		i++;
-	}
-	return (result * sign);
+	return (EXIT_SUCCESS);
 }
