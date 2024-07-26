@@ -6,12 +6,19 @@
 /*   By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/10 21:16:01 by tsantana          #+#    #+#             */
-/*   Updated: 2024/07/25 19:50:08 by tsantana         ###   ########.fr       */
+/*   Updated: 2024/07/26 16:07:13 by tsantana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/philo.h"
-#include <stdlib.h>
+
+static long	usec_definition(void)
+{
+	struct timeval	usec;
+
+	gettimeofday(&usec, NULL);
+	return (usec.tv_sec * 1000 * 1000 + usec.tv_usec);
+}
 
 static void	error_input(int ac)
 {
@@ -55,12 +62,20 @@ int	main(int ac, char **av)
 	t_general	main_strc;
 
 	main_strc = (t_general){0};
+	main_strc.usec = usec_definition();
+	printf("%lu\n", main_strc.usec);
 	if (ac == 5 || ac == 6)
 	{
 		if (valid_args(av))
-			return (correct_input(ac, av, &main_strc), EXIT_SUCCESS);
+		{
+			correct_input(ac, av, &main_strc);
+			return (final_free(&main_strc), EXIT_SUCCESS);
+		}
 	}
 	else
-		return (error_input(ac), EXIT_FAILURE);
+	{
+		error_input(ac);
+		return (final_free(&main_strc), EXIT_FAILURE);
+	}
 	return (EXIT_SUCCESS);
 }

@@ -6,13 +6,14 @@
 /*   By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/10 21:16:28 by tsantana          #+#    #+#             */
-/*   Updated: 2024/07/24 21:57:41 by tsantana         ###   ########.fr       */
+/*   Updated: 2024/07/26 16:45:42 by tsantana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PHILO_H
 # define PHILO_H
 
+#include <bits/types/struct_timeval.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <pthread.h>
@@ -42,14 +43,15 @@ typedef struct s_philos
 
 typedef struct s_general
 {
-	t_philos	*philos;
-	long		time_eat;
-	long		time_sleep;
-	pthread_t	monitors;
-	int			qnt_philos;
-	int			qnt_forks;
-	int			max_meals;
-	t_mutex		*write;
+	t_philos		*philos;
+	long			usec;
+	long			time_eat;
+	long			time_sleep;
+	pthread_t		monitors;
+	int				qnt_philos;
+	int				qnt_forks;
+	int				max_meals;
+	t_mutex			*write;
 }	t_general;
 
 enum e_status
@@ -64,6 +66,7 @@ enum e_status
 void		ft_print_instructions(void);
 void		correct_input(int ac, char **av, t_general *gnrl);
 void		print_philo(t_philos *phl);
+void		final_free(t_general *gnrl);
 int			ft_atoi(const char *nptr);
 t_philos	*make_philo_order(char *num);
 

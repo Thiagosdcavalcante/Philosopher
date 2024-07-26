@@ -1,15 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   task_routine.c                                     :+:      :+:    :+:   */
+/*   free_struct.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/07/25 19:15:37 by tsantana          #+#    #+#             */
-/*   Updated: 2024/07/26 16:02:24 by tsantana         ###   ########.fr       */
+/*   Created: 2024/07/26 16:02:30 by tsantana          #+#    #+#             */
+/*   Updated: 2024/07/26 16:17:01 by tsantana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/philo.h"
+#include <pthread.h>
 
+static void	free_philos(t_philos *phl)
+{
+	t_philos	*temp;
 
+	phl->prv->nxt = NULL;
+	phl->prv = NULL;
+	while (phl)
+	{
+		temp = phl;
+		phl = phl->nxt;
+		pthread_mutex_destroy(&temp->f_left);
+		free(temp);
+	}
+}
+
+void	final_free(t_general *gnrl)
+{
+	if (gnrl->philos)
+		free_philos(gnrl->philos);
+}
