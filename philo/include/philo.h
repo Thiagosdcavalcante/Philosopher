@@ -6,7 +6,7 @@
 /*   By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/10 21:16:28 by tsantana          #+#    #+#             */
-/*   Updated: 2024/07/26 16:45:42 by tsantana         ###   ########.fr       */
+/*   Updated: 2024/07/27 19:11:44 by tsantana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,13 +30,14 @@ typedef pthread_mutex_t	t_mutex;
 
 typedef struct s_philos
 {
-	pthread_t	philo;
-	int			id;
-	t_mutex		f_left;
-	t_mutex		*f_right;
-	t_mutex		*meal;
-	t_mutex		*dead;
-
+	pthread_t		philo;
+	int				id;
+	int				dead;
+	int				status;
+	int				status_chagend;
+	t_mutex			f_left;
+	t_mutex			*f_right;
+	t_mutex			*meal;
 	struct s_philos	*nxt;
 	struct s_philos	*prv;
 }	t_philos;
@@ -48,6 +49,7 @@ typedef struct s_general
 	long			time_eat;
 	long			time_sleep;
 	pthread_t		monitors;
+	int				has_dead;
 	int				qnt_philos;
 	int				qnt_forks;
 	int				max_meals;
@@ -67,6 +69,7 @@ void		ft_print_instructions(void);
 void		correct_input(int ac, char **av, t_general *gnrl);
 void		print_philo(t_philos *phl);
 void		final_free(t_general *gnrl);
+void		*monitor_routine(void *gnrl);
 int			ft_atoi(const char *nptr);
 t_philos	*make_philo_order(char *num);
 

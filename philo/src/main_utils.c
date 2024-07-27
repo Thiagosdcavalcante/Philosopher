@@ -6,12 +6,11 @@
 /*   By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/11 17:31:24 by tsantana          #+#    #+#             */
-/*   Updated: 2024/07/26 15:33:00 by tsantana         ###   ########.fr       */
+/*   Updated: 2024/07/27 19:13:13 by tsantana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/philo.h"
-#include <stdio.h>
 
 void	print_philo(t_philos *phl)
 {

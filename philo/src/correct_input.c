@@ -6,13 +6,13 @@
 /*   By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 15:42:51 by tsantana          #+#    #+#             */
-/*   Updated: 2024/07/25 19:50:17 by tsantana         ###   ########.fr       */
+/*   Updated: 2024/07/27 19:11:33 by tsantana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/philo.h"
 
-void	set_next_forks(t_general **gnrl)
+static void	set_next_forks(t_general **gnrl)
 {
 	int			stop;
 	t_philos	*phl;
@@ -30,32 +30,39 @@ void	set_next_forks(t_general **gnrl)
 	(*gnrl)->philos = phl;
 }
 
+static void	action_5(t_general *gnrl, char **av, int ac)
+{
+	gnrl->philos = make_philo_order(av[1]);
+	set_next_forks(&gnrl);
+	pthread_create(&gnrl->monitors, NULL, monitor_routine, (void *) gnrl);
+	print_philo(gnrl->philos);
+}
+
+static void	action_6(t_general *gnrl, char **av, int ac)
+{
+	gnrl->philos = make_philo_order(av[1]);
+	set_next_forks(&gnrl);
+	print_philo(gnrl->philos);
+	printf("forks: %d\n", gnrl->qnt_forks);
+}
+
 void	correct_input(int ac, char **av, t_general *gnrl)
 {
 	int	i;
 
 	i = 1;
-	if (ac == 5)
-	{
-		gnrl->philos = make_philo_order(av[1]);
-		set_next_forks(&gnrl);
-		print_philo(gnrl->philos);
-	}
-	else
-	{
-		if (av[6])
-			gnrl->max_meals = ft_atoi(av[6]);
-		gnrl->philos = make_philo_order(av[1]);
-		set_next_forks(&gnrl);
-		print_philo(gnrl->philos);
-		printf("forks: %d\n", gnrl->qnt_forks);
-	}
 	gnrl->qnt_philos = ft_atoi(av[1]);
-	printf("philos: %d\n", gnrl->qnt_philos);
+	/* printf("philos: %d\n", gnrl->qnt_philos); */
 	gnrl->time_eat = ft_atoi(av[2]);
-	printf("eat: %ld\n", gnrl->time_eat);
+	/* printf("eat: %ld\n", gnrl->time_eat); */
 	gnrl->time_sleep = ft_atoi(av[3]);
-	printf("sleep: %ld\n", gnrl->time_sleep);
+	/* printf("sleep: %ld\n", gnrl->time_sleep); */
 	gnrl->qnt_forks = ft_atoi(av[1]);
-	printf("forks: %d\n", gnrl->qnt_forks);
+	/* printf("forks: %d\n", gnrl->qnt_forks); */
+	if (av[6])
+		gnrl->max_meals = ft_atoi(av[6]);
+	if (ac == 5)
+		action_5(gnrl, av, ac);
+	else
+		action_6(gnrl, av, ac);
 }
