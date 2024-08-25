@@ -6,7 +6,7 @@
 #    By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/20 16:52:41 by tsantana          #+#    #+#              #
-#    Updated: 2024/07/26 16:07:54 by tsantana         ###   ########.fr        #
+#    Updated: 2024/07/30 14:43:59 by tsantana         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,10 @@ SRC		:= src/main.c \
 			src/main_utils.c \
 			src/ft_atoi.c \
 			src/correct_input.c \
-			src/free_struct.c
+			src/free_struct.c \
+			src/task_routine.c \
+			src/timer_def.c \
+			src/correct_input_utils.c
 
 OBJ		:= $(SRC:%.c=%.o)
 

@@ -6,19 +6,13 @@
 /*   By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/10 21:16:01 by tsantana          #+#    #+#             */
-/*   Updated: 2024/07/27 19:12:53 by tsantana         ###   ########.fr       */
+/*   Updated: 2024/08/25 20:07:44 by tsantana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/philo.h"
-
-static long	usec_definition(void)
-{
-	struct timeval	usec;
-
-	gettimeofday(&usec, NULL);
-	return (usec.tv_sec * 1000 * 1000 + usec.tv_usec);
-}
+#include <pthread.h>
+#include <stdlib.h>
 
 static void	error_input(int ac)
 {
@@ -59,23 +53,15 @@ static int	valid_args(char **av)
 
 int	main(int ac, char **av)
 {
-	t_general	main_strc;
+	t_monitor	monitor;
 
-	main_strc = (t_general){0};
-	main_strc.usec = usec_definition();
-	printf("%lu\n", main_strc.usec);
-	if (ac == 5 || ac == 6)
-	{
+	monitor = (t_monitor){0};
+	monitor.phl = malloc(sizeof(t_philos));
+	monitor.gnrl = malloc(sizeof(t_general));
+	if (!(ac == 5 || ac == 6))
+		return (error_input(ac), EXIT_FAILURE);
+	else 
 		if (valid_args(av))
-		{
-			correct_input(ac, av, &main_strc);
-			return (final_free(&main_strc), EXIT_SUCCESS);
-		}
-	}
-	else
-	{
-		error_input(ac);
-		return (final_free(&main_strc), EXIT_FAILURE);
-	}
+			return (correct_input(av, &monitor), EXIT_SUCCESS);
 	return (EXIT_SUCCESS);
 }

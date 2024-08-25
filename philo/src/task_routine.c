@@ -6,49 +6,89 @@
 /*   By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/25 19:15:37 by tsantana          #+#    #+#             */
-/*   Updated: 2024/07/27 19:13:03 by tsantana         ###   ########.fr       */
+/*   Updated: 2024/08/25 19:41:38 by tsantana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/philo.h"
+#include <bits/pthreadtypes.h>
+#include <pthread.h>
+#include <sys/time.h>
+#include <unistd.h>
 
-static void	print_status(t_philos *phl)
+static void	ft_sleeping(t_philos *philo, t_general *gnrl)
 {
-	if (phl->status == EATING)
-		printf(RED " IS EATING!" RESET);
-	else if (phl->status == SLEEPING)
-		printf(MAG " IS SLEEPING!" RESET);
-	else if (phl->status == THINKING)
-		printf(GRN " IS THINKING!" RESET);
-	else if (phl->status == DEAD)
-		printf(RED " IS DEAD!" RESET);
-	else if (phl->status == HAS_FORK)
-		printf(GRN " PHILOSOPHER TOOK A NEW FORK!" RESET);
+	if ((gnrl->time_die - (philo->born + gnrl->time_sleep)) > 0)
+	{
+		print_philo_activity(gnrl, philo, SLEEPING);
+		usleep(gnrl->time_sleep);
+	}
+	else
+	{
+		print_philo_activity(gnrl, philo, SLEEPING);
+		usleep(gnrl->time_die - philo->born);
+		print_philo_activity(gnrl, philo, DEAD);
+		pthread_mutex_lock(&gnrl->m_dead);
+		gnrl->dead = 1;
+		pthread_mutex_unlock(&gnrl->m_dead);
+	}
 }
 
-void	*monitor_routine(void *gnrl)
+static void	ft_thinking(t_philos *philo, t_general *gnrl)
 {
-	int	stop;
-	t_general	*general;
-
-	general = (t_general *) gnrl;
-	while (general->has_dead == 0)
+	if ((gnrl->time_die - (philo->born + (8 * 1000))) > 0)
 	{
-		stop = general->philos->id;
-		if (general->philos->dead == 1)
-			break ;
-		general->philos = general->philos->nxt;
-		while (general->philos->id != stop)
-		{
-			if (general->philos->status == 1)
-			{
-				print_status(general->philos);
-				general->philos->status = 0;
-			}
-			if (general->philos->dead == 1)
-				break ;
-			general->philos = general->philos->nxt;
-		}
+		print_philo_activity(gnrl, philo, THINKING);
+		usleep(8 * 1000);
 	}
-	return (0);
+	else
+	{
+		print_philo_activity(gnrl, philo, THINKING);
+		usleep(gnrl->time_die - philo->born);
+		print_philo_activity(gnrl, philo, DEAD);
+		pthread_mutex_lock(&gnrl->m_dead);
+		gnrl->dead = 1;
+		pthread_mutex_unlock(&gnrl->m_dead);
+	}
+}
+
+static void	ft_eat(t_philos *philo, t_general *gnrl)
+{
+	pthread_mutex_lock(philo->meal);
+	if ((philo->qnt_meal >= 1 && gnrl->max_meals != 0)
+		|| (philo->qnt_meal == 0 && gnrl->max_meals == 0))
+	{
+		pthread_mutex_lock(&philo->f_left);
+		print_philo_activity(gnrl, philo, HAS_FORK);
+		pthread_mutex_lock(philo->f_right);
+		print_philo_activity(gnrl, philo, HAS_FORK);
+		print_philo_activity(gnrl, philo, EATING);
+		philo->born = usec_definition();
+		if (gnrl->max_meals != 0)
+			philo->qnt_meal--;
+		usleep(gnrl->time_eat);
+		pthread_mutex_unlock(&philo->f_left);
+		pthread_mutex_unlock(philo->f_right);
+	}
+	pthread_mutex_unlock(philo->meal);
+}
+
+void	*philo_routine(void *arg)
+{
+	t_philos	*phl;
+
+	phl = (t_philos *)arg;
+	if ((phl->id % 2) == 0)
+	{
+		ft_sleeping(phl, phl->reference);
+		ft_thinking(phl, phl->reference);
+		ft_eat(phl, phl->reference);
+	}
+	else if ((phl->id % 2) == 1)
+	{
+		ft_eat(phl, phl->reference);
+		ft_thinking(phl, phl->reference);
+		ft_sleeping(phl, phl->reference);
+	}
+	return (arg);
 }

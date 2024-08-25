@@ -6,44 +6,23 @@
 /*   By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/11 17:31:24 by tsantana          #+#    #+#             */
-/*   Updated: 2024/07/27 19:13:13 by tsantana         ###   ########.fr       */
+/*   Updated: 2024/08/25 19:45:52 by tsantana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/philo.h"
 
-void	print_philo(t_philos *phl)
-{
-	int	stop;
-
-	stop = phl->id;
-	printf(GRN "PHILO: %d -" RESET, phl->id);
-	if (phl->f_right)
-		printf(GRN " TRUE" RESET);
-	else
-		printf(GRN " FALSE" RESET);
-	printf(GRN "\n" RESET);
-	phl = phl->nxt;
-	while (phl->id != stop)
-	{
-		printf(GRN "PHILO: %d -" RESET, phl->id);
-		if (phl->f_right)
-			printf(GRN " TRUE" RESET);
-		else
-			printf(GRN " FALSE" RESET);
-		printf(GRN "\n" RESET);
-		phl = phl->nxt;
-	}
-}
-
-static t_philos	*make_sequence_philos(int numb, t_philos *head)
+static t_philos	*make_sequence_philos(int numb, t_philos *head, t_general *gnrl)
 {
 	t_philos	*philo;
 	
 	philo = malloc(sizeof(t_philos));
 	if (!philo)
 		return (NULL);
+	philo->reference = gnrl;
 	philo->philo = 0;
+	philo->meal = 0;
+	philo->born = usec_definition();
 	philo->f_left = (t_mutex){0};
 	philo->f_right = NULL;
 	pthread_mutex_init(&philo->f_left, NULL);
@@ -54,7 +33,7 @@ static t_philos	*make_sequence_philos(int numb, t_philos *head)
 	return (philo);
 }
 
-static t_philos	*init_philo(void)
+static t_philos	*init_philo(t_general *gnrl)
 {
 	t_philos	*philo;
 	
@@ -62,7 +41,9 @@ static t_philos	*init_philo(void)
 	if (!philo)
 		return (NULL);
 	philo->id = 1;
+	philo->reference = gnrl;
 	philo->philo = 0;
+	philo->meal = 0;
 	philo->f_right = NULL;
 	philo->f_left = (t_mutex){0};
 	pthread_mutex_init(&philo->f_left, NULL);
@@ -71,22 +52,20 @@ static t_philos	*init_philo(void)
 	return (philo);
 }
 
-t_philos	*make_philo_order(char *num)
+t_philos	*make_philo_order(int num, t_general **gnrl)
 {
 	int			i;
-	int			numb;
 	t_philos	*philos;
 	t_philos	*head;
 
-	numb = ft_atoi(num);
 	i = 2;
-	philos = init_philo();
+	philos = init_philo(*gnrl);
 	head = philos;
-	if (numb > 1)
+	if (num > 1)
 	{
-		while (i <= numb)
+		while (i <= num)
 		{
-			philos->nxt = make_sequence_philos(i, head);
+			philos->nxt = make_sequence_philos(i, head, *gnrl);
 			philos->nxt->prv = philos;
 			philos = philos->nxt;
 			i++;
