@@ -6,7 +6,7 @@
 #    By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/20 16:52:41 by tsantana          #+#    #+#              #
-#    Updated: 2024/07/30 14:43:59 by tsantana         ###   ########.fr        #
+#    Updated: 2024/09/18 19:13:24 by tsantana         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,16 +16,16 @@ CC		:= cc
 
 CFLAGS	:= -pthread -Wall -Wextra -Werror -g3
 
-HEADERS	:= -I include/ -I lib/libft/
+HEADERS	:= -I ./include
 
 SRC		:= src/main.c \
-			src/main_utils.c \
-			src/ft_atoi.c \
+			src/general_utils/main_utils.c \
 			src/correct_input.c \
-			src/free_struct.c \
-			src/task_routine.c \
-			src/timer_def.c \
-			src/correct_input_utils.c
+			src/routines/task_routine.c \
+			src/correct_input_utils.c \
+			src/general_utils/general_utils.c \
+			src/general_utils/sup_for_philos.c \
+			src/routines/monitoring.c
 
 OBJ		:= $(SRC:%.c=%.o)
 
