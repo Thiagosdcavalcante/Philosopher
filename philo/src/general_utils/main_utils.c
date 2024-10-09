@@ -6,7 +6,7 @@
 /*   By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/11 17:31:24 by tsantana          #+#    #+#             */
-/*   Updated: 2024/10/09 15:40:14 by tsantana         ###   ########.fr       */
+/*   Updated: 2024/10/09 16:04:05 by tsantana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ static t_philos	*init_philo(t_general *gnrl, int id, t_philos *prev)
 	philo->nxt = NULL;
 	philo->prv = prev;
 	pthread_mutex_init(&philo->f_left, NULL);
+	pthread_mutex_init(&philo->m_last, NULL);
 	pthread_mutex_init(&philo->death, NULL);
 	return (philo);
 }

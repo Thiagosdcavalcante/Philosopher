@@ -6,7 +6,7 @@
 /*   By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/25 19:15:37 by tsantana          #+#    #+#             */
-/*   Updated: 2024/10/07 21:37:03 by tsantana         ###   ########.fr       */
+/*   Updated: 2024/10/09 18:11:47 by tsantana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ static void	ft_sleeping(t_philos *philo)
 	pthread_mutex_lock(&philo->m_last);
 	last_meal = philo->last_meal;
 	pthread_mutex_unlock(&philo->m_last);
-	if ((last_meal + temp) >= (last_meal + die))
+	if ((usec_definition() - last_meal) >= die)
 	{
 		sleeping_sup(philo, die);
 		return ;
@@ -117,10 +117,10 @@ void	*philo_routine(void *arg)
 			pthread_mutex_unlock(&phl->reference->everyone);
 			return (arg);
 		}
-		ft_thinking(phl);
+		ft_sleeping(phl);
 		if (phl_routine_sup(phl) == 0 && ft_is_dead(phl) == 0)
-			ft_sleeping(phl);
-		else
+			ft_thinking(phl);
+		else if (phl->qnt_meal != 0)
 		{
 			pthread_mutex_lock(&phl->death);
 			phl->is_dead = 1;

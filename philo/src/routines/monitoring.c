@@ -6,11 +6,12 @@
 /*   By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/13 15:36:24 by tsantana          #+#    #+#             */
-/*   Updated: 2024/10/07 21:29:50 by tsantana         ###   ########.fr       */
+/*   Updated: 2024/10/09 17:30:15 by tsantana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/philo.h"
+#include <pthread.h>
 
 static int	check_for_food(t_monitor *mntr)
 {
@@ -22,6 +23,17 @@ static int	check_for_food(t_monitor *mntr)
 	if (everyone_eat == mntr->gnrl->qnt_philos)
 		return (1);
 	return (0);
+}
+
+static void	sup_for_destroy(t_general *gnrl)
+{
+	pthread_mutex_destroy(&gnrl->m_dead);
+	pthread_mutex_destroy(&gnrl->everyone);
+	pthread_mutex_destroy(&gnrl->m_born);
+	pthread_mutex_destroy(&gnrl->m_meal);
+	pthread_mutex_destroy(&gnrl->m_sleep);
+	pthread_mutex_destroy(&gnrl->m_die);
+	pthread_mutex_destroy(&gnrl->write);
 }
 
 void	destroy_everything(t_monitor *mntr)
@@ -37,11 +49,16 @@ void	destroy_everything(t_monitor *mntr)
 		tmp = philos;
 		philos = philos->nxt;
 		if (tmp)
+		{
+			pthread_mutex_destroy(&tmp->f_left);
+			pthread_mutex_destroy(&tmp->m_last);
+			pthread_mutex_destroy(&tmp->death);
 			free(tmp);
+		}
 	}
 	free(philos);
+	sup_for_destroy(mntr->gnrl);
 	free(mntr->gnrl);
-	
 }
 
 void	*ft_monitoring(void *arg)

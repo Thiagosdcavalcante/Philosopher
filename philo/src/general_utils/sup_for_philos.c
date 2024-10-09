@@ -6,7 +6,7 @@
 /*   By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 17:58:06 by tsantana          #+#    #+#             */
-/*   Updated: 2024/10/09 15:31:51 by tsantana         ###   ########.fr       */
+/*   Updated: 2024/10/09 18:07:11 by tsantana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ int	ft_is_dead(t_philos *phl)
 	pthread_mutex_lock(&phl->reference->m_die);
 	time_to_die = phl->reference->time_die;
 	pthread_mutex_unlock(&phl->reference->m_die);
-	if ((usec_definition() - last_meal) >= time_to_die)
+	if ((usec_definition() - last_meal) > time_to_die)
 		return (1);
 	return (0);
 }

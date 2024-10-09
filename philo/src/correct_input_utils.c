@@ -6,7 +6,7 @@
 /*   By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 14:36:31 by tsantana          #+#    #+#             */
-/*   Updated: 2024/10/09 15:41:00 by tsantana         ###   ########.fr       */
+/*   Updated: 2024/10/09 18:26:20 by tsantana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,19 +26,19 @@ void	my_print_func(t_philos *phl, int type)
 		return ;
 	pthread_mutex_lock(&phl->reference->write);
 	if (type == HAS_FORK)
-		printf("%5ld %d "MAG"has a new fork\n"RESET,
+		printf("%ld %d "MAG"has taken a fork\n"RESET,
 			time, phl->id);
 	else if (type == EATING)
-		printf("%5ld %d "MAG"is eating\n"RESET,
+		printf("%ld %d "MAG"is eating\n"RESET,
 			time, phl->id);
 	else if (type == SLEEPING)
-		printf("%5ld %d " CYAN "is sleeping\n" RESET,
+		printf("%ld %d " CYAN "is sleeping\n" RESET,
 			time, phl->id);
 	else if (type == THINKING)
-		printf("%5ld %d " GRN "is thinking\n" RESET,
+		printf("%ld %d " GRN "is thinking\n" RESET,
 			time, phl->id);
 	else if (type == DEAD)
-		printf("%5ld %d " RED "is DEAD!\n" RESET,
+		printf("%ld %d " RED "died\n" RESET,
 			time, phl->id);
 	pthread_mutex_unlock(&phl->reference->write);
 }
@@ -46,6 +46,8 @@ void	my_print_func(t_philos *phl, int type)
 void	ft_thinking(t_philos *philo)
 {
 	my_print_func(philo, THINKING);
+	/* usleep((philo->reference->time_die - (philo->reference->time_eat + philo->reference->time_sleep) - 100) * 1000); */
+	usleep(50);
 }
 
 void	join_threads(t_philos **phl, int stop, t_monitor *mntr)
@@ -86,7 +88,6 @@ void	init_philos_aux(t_philos **phl, int stop)
 	(*phl) = (*phl)->nxt;
 	while ((*phl)->id <= stop)
 	{
-		usleep(1000);
 		if ((*phl)->id % 2 == 0)
 			put_time_pthread(phl);
 		if ((*phl)->id == stop)

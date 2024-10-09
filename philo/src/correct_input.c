@@ -6,21 +6,31 @@
 /*   By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 15:42:51 by tsantana          #+#    #+#             */
-/*   Updated: 2024/10/07 19:55:19 by tsantana         ###   ########.fr       */
+/*   Updated: 2024/10/09 17:15:09 by tsantana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/philo.h"
 #include <pthread.h>
 
+static void	finish_one_philo(t_monitor *mntr)
+{
+	pthread_mutex_init(&mntr->phl->f_left, NULL);
+	pthread_mutex_init(&mntr->phl->m_last, NULL);
+	pthread_mutex_init(&mntr->phl->death, NULL);
+	pthread_join(mntr->monitors, NULL);
+}
+
 void	*one_philo(void *arg)
 {
 	t_monitor	*mntr;
 
 	mntr = (t_monitor *)arg;
-	my_print_func(mntr->phl, HAS_FORK);
+	printf("%ld %d "MAG"has taken a fork\n"RESET,
+		(usec_definition() - mntr->phl->last_meal), mntr->phl->id);
 	usleep(mntr->gnrl->time_die * 1000);
-	my_print_func(mntr->phl, DEAD);
+	printf("%ld %d "RED"died\n"RESET,
+		(usec_definition() - mntr->phl->last_meal), mntr->phl->id);
 	return (arg);
 }
 
@@ -44,10 +54,11 @@ static void	make_one_philo(t_philos **phl, t_general *gnrl, t_monitor **mntr)
 	(*phl)->nxt = NULL;
 	(*phl)->prv = NULL;
 	pthread_mutex_init(&(*phl)->f_left, NULL);
+	pthread_mutex_init(&(*phl)->m_last, NULL);
 	pthread_mutex_init(&(*phl)->death, NULL);
 	pthread_create(&(*phl)->philo, NULL, &one_philo, (void *)(*mntr));
+	pthread_join((*phl)->philo, NULL);
 }
-
 
 static void	make_philos(t_philos **phl, t_general *gnrl, t_monitor *mntr)
 {
@@ -70,5 +81,8 @@ void	correct_input(char **av, t_monitor *mntr)
 	if (mntr->gnrl->qnt_philos > 1)
 		make_philos(&mntr->phl, mntr->gnrl, mntr);
 	else
+	{
 		make_one_philo(&mntr->phl, mntr->gnrl, &mntr);
+		finish_one_philo(mntr);
+	}
 }

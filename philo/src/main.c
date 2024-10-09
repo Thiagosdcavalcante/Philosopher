@@ -6,7 +6,7 @@
 /*   By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/10 21:16:01 by tsantana          #+#    #+#             */
-/*   Updated: 2024/10/09 15:33:11 by tsantana         ###   ########.fr       */
+/*   Updated: 2024/10/09 17:09:50 by tsantana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,8 +62,11 @@ int	main(int ac, char **av)
 		if (valid_args(av))
 		{
 			correct_input(av, &monitor);
-			join_threads(&monitor.phl, monitor.gnrl->qnt_philos, &monitor);
-			pthread_join(monitor.monitors, NULL);
+			if (monitor.gnrl->qnt_philos != 1)
+			{
+				join_threads(&monitor.phl, monitor.gnrl->qnt_philos, &monitor);
+				pthread_join(monitor.monitors, NULL);
+			}
 			destroy_everything(&monitor);
 			return (EXIT_SUCCESS);
 		}
