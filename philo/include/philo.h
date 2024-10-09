@@ -6,7 +6,7 @@
 /*   By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/10 21:16:28 by tsantana          #+#    #+#             */
-/*   Updated: 2024/09/29 16:09:36 by tsantana         ###   ########.fr       */
+/*   Updated: 2024/10/07 21:43:26 by tsantana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 # define RESET	"\x1b[0m"
 # define MAG	"\033[0;35m"
 # define GRN	"\x1b[32m"
+# define CYAN	"\033[0;36m"
 
 # define MAX_PHILOS 200
 
@@ -34,15 +35,18 @@ typedef suseconds_t		t_usec;
 
 typedef struct s_general
 {
-	long			usec;
+	long			born;
 	long			time_eat;
 	long			time_sleep;
 	long			time_die;
 	int				dead;
+	int				everyone_eat;
 	int				qnt_philos;
 	int				qnt_forks;
 	int				max_meals;
 	t_mutex			m_dead;
+	t_mutex			everyone;;
+	t_mutex			m_born;
 	t_mutex			m_meal;
 	t_mutex			m_sleep;
 	t_mutex			m_die;
@@ -57,8 +61,9 @@ typedef struct s_philos
 	int				qnt_meal;
 	int				is_dead;
 	t_mutex			f_left;
+	t_mutex			m_last;
 	t_mutex			death;
-	t_mutex			f_right;
+	t_mutex			*f_right;
 	t_general		*reference;
 	struct s_philos	*nxt;
 	struct s_philos	*prv;
@@ -80,23 +85,25 @@ enum e_status
 	DEAD
 };
 
-void		*philo_odd_routine(void *arg);
-void		*philo_pair_routine(void *arg);
+void		*philo_routine(void *arg);
 void		*ft_monitoring(void *arg);
 void		ft_print_instructions(void);
 void		correct_input(char **av, t_monitor *mntr);
-void		print_philo_activity(t_general *gnrl, t_philos *phl, int type);
 void		*monitor_routine(void *gnrl);
-void		destroy_everything(t_monitor **mntr);
+void		destroy_everything(t_monitor *mntr);
 void		get_timer_routines(t_general **gnrl, char **av);
 void		init_philos_aux(t_philos **phl, int stop);
-void		write_mutex(t_general *gnrl, t_philos *phl, char *msg, t_usec time);
 void		ft_putendl_fd(char *s, int fd);
 void		*one_philo(void *arg);
-void		join_threads(t_philos **phl, int stop);
-// void		monitor_init(t_monitor *mntr, char **av);
+void		join_threads(t_philos **phl, int stop, t_monitor *mntr);
+void		sleeping_sup(t_philos *phl, int die);
+void		my_print_func(t_philos *phl, int type);
+void		ft_thinking(t_philos *philo);
 long		usec_definition(void);
 long		ft_atol(const char *nptr);
+int			my_print_sup(t_general *gnrl);
+int			ft_is_dead(t_philos *phl);
+int			phl_routine_sup(t_philos *phl);
 int			is_number(char numb);
 t_philos	*make_philo_order(int num, t_general *gnrl);
 t_general	*general_init(char **av);

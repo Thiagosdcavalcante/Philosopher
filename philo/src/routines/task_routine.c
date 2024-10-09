@@ -6,150 +6,127 @@
 /*   By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/25 19:15:37 by tsantana          #+#    #+#             */
-/*   Updated: 2024/09/29 18:46:33 by tsantana         ###   ########.fr       */
+/*   Updated: 2024/10/07 21:37:03 by tsantana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/philo.h"
+#include <pthread.h>
 
 static void	ft_sleeping(t_philos *philo)
 {
 	long	temp;
 	long	die;
+	long	last_meal;
 
 	pthread_mutex_lock(&philo->reference->m_die);
-	die = philo->reference->time_die * 1000;
+	die = philo->reference->time_die;
 	pthread_mutex_unlock(&philo->reference->m_die);
-	print_philo_activity(philo->reference, philo, SLEEPING);
 	pthread_mutex_lock(&philo->reference->m_sleep);
-	temp = philo->reference->time_sleep * 1000;
+	temp = philo->reference->time_sleep;
 	pthread_mutex_unlock(&philo->reference->m_sleep);
-	pthread_mutex_lock(&philo->death);
-	pthread_mutex_lock(&philo->reference->m_die);
-	if (philo->is_dead == 0 && philo->reference->dead == 0)
+	my_print_func(philo, SLEEPING);
+	pthread_mutex_lock(&philo->m_last);
+	last_meal = philo->last_meal;
+	pthread_mutex_unlock(&philo->m_last);
+	if ((last_meal + temp) >= (last_meal + die))
 	{
-		pthread_mutex_unlock(&philo->reference->m_die);
-		pthread_mutex_unlock(&philo->death);
-	}
-	else if ((philo->last_meal + temp) > (philo->last_meal + die))
-	{
-		pthread_mutex_lock(&philo->death);
-		philo->is_dead = 1;
-		pthread_mutex_unlock(&philo->death);
-		usleep(die * 1000);
+		sleeping_sup(philo, die);
 		return ;
 	}
 	usleep(temp * 1000);
 }
 
-static void	ft_thinking(t_philos *philo)
+static void	sup_for_eating(t_philos *philo)
 {
-	long	die;
+	int	meal;
 
-	pthread_mutex_lock(&philo->reference->m_die);
-	die = philo->reference->time_die + philo->last_meal;
-	pthread_mutex_unlock(&philo->reference->m_die);
-	pthread_mutex_lock(&philo->reference->m_dead);
-	pthread_mutex_lock(&philo->death);
-	if (philo->is_dead == 1 || philo->reference->dead == 1)
+	meal = 0;
+	pthread_mutex_lock(&philo->reference->m_meal);
+	meal = philo->reference->time_eat;
+	pthread_mutex_unlock(&philo->reference->m_meal);
+	usleep(meal * 1000);
+	if (philo->id % 2 != 0)
 	{
-		pthread_mutex_unlock(&philo->reference->m_dead);
-		pthread_mutex_unlock(&philo->death);
+		pthread_mutex_unlock(&philo->f_left);
+		pthread_mutex_unlock(philo->f_right);
 	}
-	else if ((die - (philo->last_meal + (8 * 1000))) > 0)
+	else if (philo->id % 2 == 0)
 	{
-		pthread_mutex_unlock(&philo->reference->m_dead);
-		pthread_mutex_unlock(&philo->death);
-		print_philo_activity(philo->reference, philo, THINKING);
-		usleep(8 * 1000);
-		return ;
+		pthread_mutex_unlock(philo->f_right);
+		pthread_mutex_unlock(&philo->f_left);
 	}
-	print_philo_activity(philo->reference, philo, THINKING);
-	usleep((die - philo->last_meal) * 1000);
-	pthread_mutex_lock(&philo->death);
-	philo->is_dead = 1;
-	pthread_mutex_unlock(&philo->death);
+}
+
+static void	cond_mutex_order(t_philos *phl)
+{
+	if (phl->id % 2 != 0)
+	{
+		pthread_mutex_lock(&phl->f_left);
+		my_print_func(phl, HAS_FORK);
+		pthread_mutex_lock(phl->f_right);
+		my_print_func(phl, HAS_FORK);
+	}
+	else if (phl->id % 2 == 0)
+	{
+		pthread_mutex_lock(phl->f_right);
+		my_print_func(phl, HAS_FORK);
+		pthread_mutex_lock(&phl->f_left);
+		my_print_func(phl, HAS_FORK);
+	}
 }
 
 static void	ft_eat(t_philos *philo)
 {
-	pthread_mutex_lock(&philo->reference->m_dead);
-	if (philo->reference->dead == 1)
-		pthread_mutex_unlock(&philo->reference->m_dead);
-	else if (philo->qnt_meal > 0 || philo->qnt_meal == -1)
+	cond_mutex_order(philo);
+	if (philo->qnt_meal > 0)
 	{
-		pthread_mutex_lock(&philo->f_left);
-		print_philo_activity(philo->reference, philo, HAS_FORK);
-		pthread_mutex_lock(&philo->f_right);
-		print_philo_activity(philo->reference, philo, HAS_FORK);
+		pthread_mutex_lock(&philo->m_last);
 		philo->last_meal = usec_definition();
-		print_philo_activity(philo->reference, philo, EATING);
+		pthread_mutex_unlock(&philo->m_last);
+		my_print_func(philo, EATING);
 		if (philo->qnt_meal > 0)
 			philo->qnt_meal--;
-		usleep(philo->reference->time_eat * 1000);
-		pthread_mutex_unlock(&philo->f_left);
-		pthread_mutex_unlock(&philo->f_right);
+		sup_for_eating(philo);
 		return ;
 	}
-	pthread_mutex_lock(&philo->death);
-	philo->is_dead = 1;
-	pthread_mutex_unlock(&philo->death);
-}
-
-void	*philo_odd_routine(void *arg)
-{
-	t_philos	*phl;
-	int			dead;
-
-	phl = (t_philos *)arg;
-	pthread_mutex_lock(&phl->death);
-	pthread_mutex_lock(&phl->reference->m_dead);
-	while (phl->is_dead == 0 || phl->reference->dead == 0)
+	else if (philo->qnt_meal == -1)
 	{
-		pthread_mutex_unlock(&phl->reference->m_dead);
-		pthread_mutex_unlock(&phl->death);
-		ft_eat(phl);
-		ft_sleeping(phl);
-		pthread_mutex_lock(&phl->death);
-		dead = phl->is_dead;
-		pthread_mutex_unlock(&phl->death);
-		if (dead == 1)
-			break ;
-		ft_thinking(phl);
-		pthread_mutex_lock(&phl->death);
-		dead = phl->is_dead;
-		pthread_mutex_unlock(&phl->death);
-		if (dead == 1)
-			break ;
+		pthread_mutex_lock(&philo->m_last);
+		philo->last_meal = usec_definition();
+		pthread_mutex_unlock(&philo->m_last);
+		my_print_func(philo, EATING);
+		sup_for_eating(philo);
+		return ;
 	}
-	return (arg);
+	sup_for_eating(philo);
 }
 
-void	*philo_pair_routine(void *arg)
+void	*philo_routine(void *arg)
 {
 	t_philos	*phl;
-	int			dead;
 
 	phl = (t_philos *)arg;
-	pthread_mutex_lock(&phl->death);
-	pthread_mutex_lock(&phl->reference->m_dead);
-	while (phl->is_dead == 0 || phl->reference->dead == 0)
+	while (phl_routine_sup(phl) == 0 && ft_is_dead(phl) == 0)
 	{
-		pthread_mutex_unlock(&phl->death);
-		pthread_mutex_unlock(&phl->reference->m_dead);
-		ft_thinking(phl);
-		pthread_mutex_lock(&phl->death);
-		dead = phl->is_dead;
-		pthread_mutex_unlock(&phl->death);
-		if (dead == 1)
-			break ;
 		ft_eat(phl);
-		ft_sleeping(phl);
-		pthread_mutex_lock(&phl->death);
-		dead = phl->is_dead;
-		pthread_mutex_unlock(&phl->death);
-		if (dead == 1)
-			break ;
+		if (phl->qnt_meal == 0)
+		{
+			pthread_mutex_lock(&phl->reference->everyone);
+			phl->reference->everyone_eat += 1;
+			pthread_mutex_unlock(&phl->reference->everyone);
+			return (arg);
+		}
+		ft_thinking(phl);
+		if (phl_routine_sup(phl) == 0 && ft_is_dead(phl) == 0)
+			ft_sleeping(phl);
+		else
+		{
+			pthread_mutex_lock(&phl->death);
+			phl->is_dead = 1;
+			pthread_mutex_unlock(&phl->death);
+			return (arg);
+		}
 	}
 	return (arg);
 }

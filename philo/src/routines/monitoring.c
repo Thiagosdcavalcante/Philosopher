@@ -6,62 +6,67 @@
 /*   By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/13 15:36:24 by tsantana          #+#    #+#             */
-/*   Updated: 2024/09/29 18:21:34 by tsantana         ###   ########.fr       */
+/*   Updated: 2024/10/07 21:29:50 by tsantana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/philo.h"
-#include <unistd.h>
 
-void	destroy_everything(t_monitor **mntr)
+static int	check_for_food(t_monitor *mntr)
+{
+	int	everyone_eat;
+
+	pthread_mutex_lock(&mntr->gnrl->everyone);
+	everyone_eat = mntr->gnrl->everyone_eat;
+	pthread_mutex_unlock(&mntr->gnrl->everyone);
+	if (everyone_eat == mntr->gnrl->qnt_philos)
+		return (1);
+	return (0);
+}
+
+void	destroy_everything(t_monitor *mntr)
 {
 	t_philos	*tmp;
+	t_philos	*philos;
 	
-	if (!(*mntr)->phl)
+	if (!mntr->phl)
 		return ;
-	while ((*mntr)->phl)
+	philos = mntr->phl;
+	while (philos->id < mntr->gnrl->qnt_philos)
 	{
-		tmp = (*mntr)->phl;
-		(*mntr)->phl = (*mntr)->phl->nxt;
-		pthread_mutex_destroy(&(*mntr)->phl->f_left);
+		tmp = philos;
+		philos = philos->nxt;
 		if (tmp)
-		{
 			free(tmp);
-			tmp = NULL;
-		}
 	}
-	if ((*mntr)->phl)
-	{
-		free((*mntr)->phl);
-		(*mntr)->phl = NULL;
-	}
-	pthread_mutex_destroy(&(*mntr)->gnrl->m_dead);
-	pthread_mutex_destroy(&(*mntr)->gnrl->write);
+	free(philos);
+	free(mntr->gnrl);
+	
 }
 
 void	*ft_monitoring(void *arg)
 {
-	t_philos	*phl;
 	t_monitor	*mntr;
+	t_philos	*phl;
+	int			phl_dead;
 
 	mntr = (t_monitor *)arg;
 	phl = mntr->phl;
-	pthread_mutex_lock(&mntr->gnrl->m_dead);
-	while (mntr->gnrl->dead == 0)
+	phl_dead = 0;
+	while (1)
 	{
-		pthread_mutex_unlock(&mntr->gnrl->m_dead);
-		pthread_mutex_lock(&phl->death);
-		if (phl->is_dead == 1)
+		if (check_for_food(mntr) == 1)
+			return (arg);
+		if (ft_is_dead(phl))
 		{
-			pthread_mutex_unlock(&phl->death);
-			print_philo_activity(mntr->gnrl, phl, DEAD);
+			my_print_func(phl, DEAD);
 			pthread_mutex_lock(&mntr->gnrl->m_dead);
 			mntr->gnrl->dead = 1;
 			pthread_mutex_unlock(&mntr->gnrl->m_dead);
-			break ;
+			return (arg);
 		}
+		usleep(1000);
 		phl = phl->nxt;
-		usleep(100);
 	}
 	return (arg);
 }

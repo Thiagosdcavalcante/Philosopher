@@ -6,11 +6,22 @@
 /*   By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/11 17:31:24 by tsantana          #+#    #+#             */
-/*   Updated: 2024/09/29 17:33:00 by tsantana         ###   ########.fr       */
+/*   Updated: 2024/10/09 15:40:14 by tsantana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/philo.h"
+
+int	my_print_sup(t_general *gnrl)
+{	
+	long	born;
+
+	pthread_mutex_lock(&gnrl->m_born);
+	born = gnrl->born;
+	pthread_mutex_unlock(&gnrl->m_born);
+	born = (usec_definition() - born);
+	return (born);
+}
 
 long	ft_atol(const char *nptr)
 {
@@ -49,7 +60,7 @@ static t_philos	*init_philo(t_general *gnrl, int id, t_philos *prev)
 	philo->qnt_meal = gnrl->max_meals;
 	philo->reference = gnrl;
 	philo->philo = 0;
-	philo->f_right = (t_mutex){0};
+	philo->f_right = NULL;
 	philo->last_meal = 0;
 	philo->nxt = NULL;
 	philo->prv = prev;
@@ -67,19 +78,17 @@ t_philos	*make_philo_order(int num, t_general *gnrl)
 	philos = init_philo(gnrl, 1, NULL);
 	head = philos;
 	i = 2;
-	printf("%d\n", philos->id);
 	while (i <= num)
 	{
 		philos->nxt = init_philo(gnrl, i, philos);
-		philos->f_right = philos->nxt->f_left;
+		philos->f_right = &philos->nxt->f_left;
 		philos = philos->nxt;
-		printf("%d\n", philos->id);
 		i++;
 	}
 	if (philos->nxt == NULL)
 	{
 		philos->nxt = head;
-		philos->f_right = philos->nxt->f_left;
+		philos->f_right = &philos->nxt->f_left;
 		head->prv = philos;
 	}
 	return (head);
