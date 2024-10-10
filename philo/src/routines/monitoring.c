@@ -6,12 +6,11 @@
 /*   By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/13 15:36:24 by tsantana          #+#    #+#             */
-/*   Updated: 2024/10/09 17:30:15 by tsantana         ###   ########.fr       */
+/*   Updated: 2024/10/10 19:33:10 by tsantana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/philo.h"
-#include <pthread.h>
 
 static int	check_for_food(t_monitor *mntr)
 {
@@ -40,7 +39,7 @@ void	destroy_everything(t_monitor *mntr)
 {
 	t_philos	*tmp;
 	t_philos	*philos;
-	
+
 	if (!mntr->phl)
 		return ;
 	philos = mntr->phl;
@@ -76,7 +75,7 @@ void	*ft_monitoring(void *arg)
 			return (arg);
 		if (ft_is_dead(phl))
 		{
-			my_print_func(phl, DEAD);
+			print_dead(mntr, phl->id);
 			pthread_mutex_lock(&mntr->gnrl->m_dead);
 			mntr->gnrl->dead = 1;
 			pthread_mutex_unlock(&mntr->gnrl->m_dead);

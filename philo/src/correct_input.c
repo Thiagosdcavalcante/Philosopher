@@ -6,7 +6,7 @@
 /*   By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/24 15:42:51 by tsantana          #+#    #+#             */
-/*   Updated: 2024/10/09 17:15:09 by tsantana         ###   ########.fr       */
+/*   Updated: 2024/10/09 18:51:24 by tsantana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ static void	make_one_philo(t_philos **phl, t_general *gnrl, t_monitor **mntr)
 		(*phl)->qnt_meal = -1;
 	(*phl)->last_meal = usec_definition();
 	(*phl)->f_right = NULL;
-	(*phl)->reference = gnrl;	
+	(*phl)->reference = gnrl;
 	(*phl)->id = 1;
 	(*phl)->nxt = NULL;
 	(*phl)->prv = NULL;
@@ -77,7 +77,7 @@ void	correct_input(char **av, t_monitor *mntr)
 		mntr->gnrl->everyone_eat = 0;
 	}
 	else
-	 	mntr->gnrl->max_meals = -1;
+		mntr->gnrl->max_meals = -1;
 	if (mntr->gnrl->qnt_philos > 1)
 		make_philos(&mntr->phl, mntr->gnrl, mntr);
 	else

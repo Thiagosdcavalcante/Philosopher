@@ -6,7 +6,7 @@
 /*   By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/10 21:16:28 by tsantana          #+#    #+#             */
-/*   Updated: 2024/10/09 15:57:39 by tsantana         ###   ########.fr       */
+/*   Updated: 2024/10/10 19:33:29 by tsantana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ typedef struct s_general
 	int				qnt_forks;
 	int				max_meals;
 	t_mutex			m_dead;
-	t_mutex			everyone;;
+	t_mutex			everyone;
 	t_mutex			m_born;
 	t_mutex			m_meal;
 	t_mutex			m_sleep;
@@ -95,16 +95,18 @@ void		get_timer_routines(t_general **gnrl, char **av);
 void		init_philos_aux(t_philos **phl, int stop);
 void		ft_putendl_fd(char *s, int fd);
 void		*one_philo(void *arg);
-void		join_threads(t_philos **phl, int stop, t_monitor *mntr);
+void		join_threads(t_philos **phl, int stop);
 void		sleeping_sup(t_philos *phl, int die);
 void		my_print_func(t_philos *phl, int type);
 void		ft_thinking(t_philos *philo);
+void		print_dead(t_monitor *mntr, int id);
 long		usec_definition(void);
 long		ft_atol(const char *nptr);
 int			my_print_sup(t_general *gnrl);
 int			ft_is_dead(t_philos *phl);
 int			phl_routine_sup(t_philos *phl);
 int			is_number(char numb);
+int			my_print_dead(t_philos *phl);
 t_philos	*make_philo_order(int num, t_general *gnrl);
 t_general	*general_init(char **av);
 

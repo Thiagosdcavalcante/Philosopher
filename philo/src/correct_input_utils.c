@@ -6,25 +6,23 @@
 /*   By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 14:36:31 by tsantana          #+#    #+#             */
-/*   Updated: 2024/10/09 18:26:20 by tsantana         ###   ########.fr       */
+/*   Updated: 2024/10/10 19:48:10 by tsantana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/philo.h"
-#include <unistd.h>
 
 void	my_print_func(t_philos *phl, int type)
 {
-	int		is_dead;
 	long	time;
 
 	time = my_print_sup(phl->reference);
-	pthread_mutex_lock(&phl->reference->m_dead);
-	is_dead = phl->reference->dead;
-	pthread_mutex_unlock(&phl->reference->m_dead);
-	if (is_dead == 1)
-		return ;
 	pthread_mutex_lock(&phl->reference->write);
+	if (my_print_dead(phl) == 1)
+	{
+		pthread_mutex_unlock(&phl->reference->write);
+		return ;
+	}
 	if (type == HAS_FORK)
 		printf("%ld %d "MAG"has taken a fork\n"RESET,
 			time, phl->id);
@@ -46,14 +44,11 @@ void	my_print_func(t_philos *phl, int type)
 void	ft_thinking(t_philos *philo)
 {
 	my_print_func(philo, THINKING);
-	/* usleep((philo->reference->time_die - (philo->reference->time_eat + philo->reference->time_sleep) - 100) * 1000); */
-	usleep(50);
+	usleep(200);
 }
 
-void	join_threads(t_philos **phl, int stop, t_monitor *mntr)
+void	join_threads(t_philos **phl, int stop)
 {
-
-	(void)mntr; 
 	while ((*phl)->id > (*phl)->prv->id)
 		(*phl) = (*phl)->prv;
 	while ((*phl)->id <= stop)
@@ -82,7 +77,7 @@ void	init_philos_aux(t_philos **phl, int stop)
 		if ((*phl)->id % 2 != 0)
 			put_time_pthread(phl);
 		if ((*phl)->id == stop)
-			break;
+			break ;
 		(*phl) = (*phl)->nxt;
 	}
 	(*phl) = (*phl)->nxt;
@@ -91,7 +86,7 @@ void	init_philos_aux(t_philos **phl, int stop)
 		if ((*phl)->id % 2 == 0)
 			put_time_pthread(phl);
 		if ((*phl)->id == stop)
-			break;
+			break ;
 		(*phl) = (*phl)->nxt;
 	}
 	(*phl) = (*phl)->nxt;

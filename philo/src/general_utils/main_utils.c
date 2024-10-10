@@ -6,7 +6,7 @@
 /*   By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/11 17:31:24 by tsantana          #+#    #+#             */
-/*   Updated: 2024/10/09 16:04:05 by tsantana         ###   ########.fr       */
+/*   Updated: 2024/10/09 18:51:08 by tsantana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ long	ft_atol(const char *nptr)
 static t_philos	*init_philo(t_general *gnrl, int id, t_philos *prev)
 {
 	t_philos	*philo;
-	
+
 	philo = malloc(sizeof(t_philos));
 	if (!philo)
 		return (NULL);

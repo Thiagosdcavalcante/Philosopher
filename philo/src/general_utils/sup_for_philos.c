@@ -6,11 +6,22 @@
 /*   By: tsantana <tsantana@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 17:58:06 by tsantana          #+#    #+#             */
-/*   Updated: 2024/10/09 18:07:11 by tsantana         ###   ########.fr       */
+/*   Updated: 2024/10/10 19:39:44 by tsantana         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/philo.h"
+
+int	my_print_dead(t_philos *phl)
+{
+	int	dead;
+
+	dead = 0;
+	pthread_mutex_lock(&phl->reference->m_dead);
+	dead = phl->reference->dead;
+	pthread_mutex_unlock(&phl->reference->m_dead);
+	return (dead);
+}
 
 t_general	*general_init(char **av)
 {
@@ -38,8 +49,8 @@ t_general	*general_init(char **av)
 
 int	phl_routine_sup(t_philos *phl)
 {
-	int		dead;
-	int		someone_die;;
+	int	dead;
+	int	someone_die;
 
 	pthread_mutex_lock(&phl->death);
 	dead = phl->is_dead;
@@ -54,6 +65,8 @@ int	phl_routine_sup(t_philos *phl)
 		phl->is_dead = 1;
 		pthread_mutex_unlock(&phl->death);
 	}
+	if (someone_die == 1)
+		return (1);
 	return (dead);
 }
 
